@@ -18,12 +18,21 @@ module reg_rst #(
     parameter int DWIDTH = 32)(
     input logic clk,
     input logic rst,
-    input logic [DWIDTH-1:0] in_i,
+    input logic  [DWIDTH-1:0] in_i,
     output logic [DWIDTH-1:0] out_o
 );
-    /*
-     * Process definitions to be filled by
-     * student below...
-     */
+
+ /*
+ * Process definitions to be filled by
+ * student below...
+ */
+ //Sequential block for reset register
+ 
+  always_ff @(posedge clk)begin
+    if (rst)
+      out_o <= 0;
+    else
+      out_o <= in_i;
+  end
 
 endmodule: reg_rst

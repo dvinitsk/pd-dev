@@ -43,4 +43,67 @@ parameter int DWIDTH = 8)(
      *
      */
 
+//Internal Wires
+//Registers
+logic [DWIDTH-1:0] op1_reg;
+logic [DWIDTH-1:0] op2_reg;
+logic [DWIDTH-1:0] add_res_reg;
+
+//ALU
+logic [DWIDTH-1:0] add_res;
+logic [DWIDTH-1:0] sub_res;
+
+reg_rst #(
+    .DWIDTH(DWIDTH)
+) op1_register (
+    .clk(clk),
+    .rst(rst),
+    .in_i(op1_i),
+    .out_o(op1_reg)       
+);
+
+reg_rst #(
+    .DWIDTH(DWIDTH)
+) op2_register (
+    .clk(clk),
+    .rst(rst),
+    .in_i(op2_i),
+    .out_o(op2_reg)       
+);
+
+alu #(.DWIDTH(DWIDTH)
+) stage_1_alu (
+    .sel_i(ADD),
+    .op1_i(op1_reg),  
+    .op2_i(op2_reg),  
+    .res_o(add_res),    
+    .zero_o(),          
+    .neg_o()
+);
+
+reg_rst #(.DWIDTH(DWIDTH)
+) reg_add (
+    .clk(clk),
+    .rst(rst),
+    .in_i(add_res),
+    .out_o(add_res_reg)
+);
+
+alu #(.DWIDTH(DWIDTH)
+) stage_2_alu (
+    .sel_i(SUB),
+    .op1_i(add_res_reg),  
+    .op2_i(op1_reg),  
+    .res_o(sub_res),  
+    .zero_o(),          
+    .neg_o()
+);
+
+reg_rst #(.DWIDTH(DWIDTH)
+) reg_sub (
+    .clk(clk),
+    .rst(rst),
+    .in_i(sub_res),
+    .out_o(res_o)
+);
 endmodule: three_stage_pipeline
