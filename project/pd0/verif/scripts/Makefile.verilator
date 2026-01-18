@@ -1,6 +1,10 @@
 SRCLIST = $(shell cat $(CL_ROOT)/verif/scripts/design.f)
 SRC = $(addprefix $(CL_ROOT)/design/code/, $(SRCLIST)) $(CL_ROOT)/verif/tests/clockgen.sv $(CL_ROOT)/design/design_wrapper.sv
 VFLAGS = -sv
+
+# Enable SystemVerilog + timing support for event controls/wait
+VFLAGS = -sv --timing
+
 TOP = top
 _CFLAGS=
 PROG=
