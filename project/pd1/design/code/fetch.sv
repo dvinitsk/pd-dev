@@ -9,7 +9,7 @@
  *
  * Outputs:
  * 1) AWIDTH wide program counter pc_o
- * 2) DWIDTH wide instruction output insn_o
+ * 2) DWIDTH wide instruction output insn_o (WIRE FROM MEMORY MOD?)
  */
 
 module fetch #(
@@ -28,6 +28,13 @@ module fetch #(
      * Process definitions to be filled by
      * student below...
      */
+
+    always_ff @(posedge clk) begin
+        if (rst)
+            pc_o <= BASEADDR; //reset to base address
+        else
+            pc_o <= pc_o + 32'd4; //pc_o increases by 4 bytes because instruction size is 32 bits
+    end
 
 endmodule : fetch
 				
