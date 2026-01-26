@@ -21,13 +21,11 @@ module pd1 #(
   *
   */
 
-logic [AWIDTH-1:0] addr;
-logic [DWIDTH-1:0] dwidth;
 logic read_en;
 logic write_en;
 logic [DWIDTH-1:0] data_in;
 logic [DWIDTH-1:0] data_out;
-
+logic [AWIDTH-1:0] addr;
 
 memory #(
   .AWIDTH(AWIDTH),
@@ -35,15 +33,15 @@ memory #(
 ) memory_1 (
     .clk        (clk),
     .rst        (reset),
-    .addr_i     (pc),  
+    .addr_i     (addr),  
     .data_i     (data_in),
     .read_en_i  (read_en),
     .write_en_i (write_en),
-    .data_o     (insn)
+    .data_o     (data_out)
 );
 
 logic [AWIDTH-1:0] pc;
-logic [DWIDTH-1:0] insn; // 32 bit instruction data output
+logic [DWIDTH-1:0] insn; 
 
 fetch #(.DWIDTH(DWIDTH),
         .AWIDTH(AWIDTH)
