@@ -18,37 +18,37 @@
 
 module memory #(
   // parameters
-  parameter int awidth = 32,
-  parameter int dwidth = 32,
-  parameter logic [31:0] base_addr = 32'h01000000
+  parameter int AWIDTH = 32,
+  parameter int DWIDTH = 32,
+  parameter logic [31:0] BASE_ADDR = 32'h01000000
 ) (
   // inputs
   input logic clk,
   input logic rst,
-  input logic [awidth-1:0] addr_i = base_addr,
-  input logic [dwidth-1:0] data_i,
+  input logic [AWIDTH-1:0] addr_i = BASE_ADDR,
+  input logic [DWIDTH-1:0] data_i,
   input logic read_en_i,
   input logic write_en_i,
   // outputs
-  output logic [dwidth-1:0] data_o
-)
+  output logic [DWIDTH-1:0] data_o
+);
 
-  logic [dwidth-1:0] temp_memory [0:`mem_depth];
+  logic [DWIDTH-1:0] temp_memory [0:`MEM_DEPTH];
   // byte-addressable memory
-  logic [7:0] main_memory [0:`mem_depth];  // byte-addressable memory
-  logic [awidth-1:0] address;
-  assign address = addr_i - base_addr;
+  logic [7:0] main_memory [0:`MEM_DEPTH];  // byte-addressable memory
+  logic [AWIDTH-1:0] address;
+  assign address = addr_i - BASE_ADDR;
 
   initial begin
-    $readmemh(`mem_path, temp_memory);
+    $readmemh(`MEM_PATH, temp_memory);
     // load data from temp_memory into main_memory
-    for (int i = 0; i < `line_count; i++) begin
+    for (int i = 0; i < `LINE_COUNT; i++) begin
       main_memory[4*i]     = temp_memory[i][7:0];
       main_memory[4*i + 1] = temp_memory[i][15:8];
       main_memory[4*i + 2] = temp_memory[i][23:16];
       main_memory[4*i + 3] = temp_memory[i][31:24];
     end
-    $display("imemory: loaded %0d 32-bit words from %s", `line_count, `mem_path);
+    $display("imemory: loaded %0d 32-bit words from %s", `LINE_COUNT, `MEM_PATH);
   end
 
   /*
