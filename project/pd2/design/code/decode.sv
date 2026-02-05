@@ -51,4 +51,33 @@ module decode #(
      * student below...
      */
 
+    //Reset signal
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            pc_o <= ZERO;
+            insn_o <= ZERO;
+        end else begin
+            pc_o <= pc_i;
+            insn_o <= insn_i;
+        end
+    end
+
+    //break instruction into fields
+    always_comb begin
+        opcode_o = insn_o[6:0];
+        rd_o = insn_o[11:7];
+        rs1_o = insn_o[19:15];
+        rs2_o = insn_o[24:20];
+        funct7_o = insn_o[31:25];
+        funct3_o = insn_o[14:12];
+        shamt_o = insn_o[24:20];
+    end
+
+    //igen for imm_o
+    igen igen1(
+        .opcode_i(opcode_o),
+        .insn_i(insn_o),
+        .imm_o(imm_o)
+    );
+
 endmodule : decode
