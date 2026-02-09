@@ -30,18 +30,18 @@ module igen #(
             R_TYPE: imm_o = ZERO;
 
             //I-type:
-            IMM: imm_o = $signed(insn_i[31:20]);
-            LOADS: imm_o = $signed(insn_i[31:20]);
-            JALR: imm_o = $signed(insn_i[31:20]);
+            IMM: imm_o = {{20{insn_i[31]}}, insn_i[31:20]};
+            LOADS: imm_o = {{20{insn_i[31]}}, insn_i[31:20]};
+            JALR: imm_o = {{20{insn_i[31]}}, insn_i[31:20]};
 
             //S-type:
-            STORES: imm_o = $signed({insn_i[31:25],insn_i[11:7]});
+            STORES: imm_o = {{20{insn_i[31]}}, insn_i[31:25],insn_i[11:7]};
 
             //B-type:
-            BRANCHES: imm_o = $signed({insn_i[31],insn_i[7],insn_i[30:25], insn_i[11:8],1'd0});
+            BRANCHES: imm_o = {{19{insn_i[31]}},insn_i[31],insn_i[7],insn_i[30:25], insn_i[11:8],1'd0};
 
             //J-type:
-            JAL: imm_o = $signed({insn_i[31],insn_i[19:12],insn_i[20], insn_i[30:21],1'd0});
+            JAL: imm_o = {{11{insn_i[31]}},insn_i[31],insn_i[19:12],insn_i[20], insn_i[30:21],1'd0};
 
             //U-type:
             LUI: imm_o = {insn_i[31:12],12'd0};
