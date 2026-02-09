@@ -65,8 +65,10 @@ module memory #(
                   main_memory[address + 2],
                   main_memory[address + 1], 
                   main_memory[address]}; 
+        data_vld_o = 1'b1;
     end else begin
         data_o = '0; 
+        data_vld_o = 1'b0;
     end
   end
 
