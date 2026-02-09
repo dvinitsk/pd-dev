@@ -1,6 +1,6 @@
 // ----  Probes  ----
-//`define PROBE_F_PC // ??
-//`define PROBE_F_INSN // ??
+`define PROBE_F_PC pc
+`define PROBE_F_INSN insn
 
 //`define PROBE_D_PC // ??
 //`define PROBE_D_OPCODE // ??

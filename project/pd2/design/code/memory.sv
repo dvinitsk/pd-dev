@@ -30,7 +30,8 @@ module memory #(
   input logic read_en_i,
   input logic write_en_i,
   // outputs
-  output logic [DWIDTH-1:0] data_o
+  output logic [DWIDTH-1:0] data_o,
+  output logic data_vld_o
 );
 
   logic [DWIDTH-1:0] temp_memory [0:`MEM_DEPTH];
