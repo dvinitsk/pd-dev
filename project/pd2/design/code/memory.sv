@@ -1,19 +1,20 @@
 /*
- * module: memory
+ * -------- REPLACE THIS FILE WITH THE MEMORY MODULE DEVELOPED IN PD1 -----------
+ * Module: memory
  *
- * description: byte-addressable memory implementation. supports both read and write operations.
- * reads are combinational and writes are performed on the rising clock edge.
+ * Description: Byte-addressable memory implementation. Supports both read and write.
  *
- * inputs:
+ * Inputs:
  * 1) clk
  * 2) rst signal
- * 3) awidth address addr_i
- * 4) dwidth data to write data_i
+ * 3) AWIDTH address addr_i
+ * 4) DWIDTH data to write data_i
  * 5) read enable signal read_en_i
  * 6) write enable signal write_en_i
  *
- * outputs:
- * 1) dwidth data output data_o
+ * Outputs:
+ * 1) DWIDTH data output data_o
+ * 2) data out valid signal data_vld_o
  */
 
 module memory #(
