@@ -54,8 +54,8 @@ module decode #(
     //Reset signal
     always_ff @(posedge clk) begin
         if (rst) begin
-            pc_o <= ZERO;
-            insn_o <= ZERO;
+            pc_o <= 32'h01000000; //BASEADDR
+            insn_o <= 32'h01000000;
         end else begin
             pc_o <= pc_i;
             insn_o <= insn_i;
@@ -81,3 +81,4 @@ module decode #(
     );
 
 endmodule : decode
+
