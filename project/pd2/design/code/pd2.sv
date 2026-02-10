@@ -4,33 +4,28 @@
  * Description: Top level module
  */
 
-module pd2 #(
-    parameter int AWIDTH = 32,
-    parameter int DWIDTH = 32
-)(
-    input logic clk,
-    input logic reset
-);
+  module pd2 #(
+      parameter int AWIDTH = 32,
+      parameter int DWIDTH = 32
+  )(
+      input logic clk,
+      input logic reset
+  );
 
-  // ------------------------------------------------------------
-  // Fetch → Decode
-  // ------------------------------------------------------------
+  //Fetch
   logic [AWIDTH-1:0] pc_fetch;
   logic [DWIDTH-1:0] insn_fetch;
 
   fetch #(
-  .DWIDTH(DWIDTH),
-  .AWIDTH(AWIDTH)
-) fetch_stage (
-  .clk(clk),
-  .rst(reset),
-  .pc_o(pc_fetch)
-);
+    .DWIDTH(DWIDTH),
+    .AWIDTH(AWIDTH)
+  ) fetch1 (
+    .clk(clk),
+    .rst(reset),
+    .pc_o(pc_fetch)
+  );
 
-
-  // ------------------------------------------------------------
-  // Decode outputs
-  // ------------------------------------------------------------
+  //Decode
   logic [AWIDTH-1:0] pc_decode;
   logic [DWIDTH-1:0] insn_decode;
   logic [6:0] opcode;
@@ -42,47 +37,7 @@ module pd2 #(
   logic [4:0] shamt;
   logic [DWIDTH-1:0] imm;
 
-  // ------------------------------------------------------------
-  // Control signals
-  // ------------------------------------------------------------
-  logic pcsel;
-  logic immsel;
-  logic regwren;
-  logic rs1sel;
-  logic rs2sel;
-  logic memren;
-  logic memwren;
-  logic [1:0] wbsel;
-  logic [3:0] alusel;
-
-// ------------------------------------------------------------
-// Fetch stage
-// ------------------------------------------------------------
-
-
-// ------------------------------------------------------------
-// Instruction memory
-// ------------------------------------------------------------
-
-memory #(
-  .AWIDTH(AWIDTH),
-  .DWIDTH(DWIDTH)
-) imem (
-  .clk(clk),
-  .rst(reset),
-  .addr_i(pc_fetch),
-  .data_i('0),
-  .read_en_i(1'b1),
-  .write_en_i(1'b0),
-  .data_o(insn_fetch),
-  .data_vld_o()   // unused
-);
-
-
-  // ------------------------------------------------------------
-  // Decode stage
-  // ------------------------------------------------------------
-  decode decode_stage (
+  decode decode1 (
     .clk(clk),
     .rst(reset),
     .insn_i(insn_fetch),
@@ -99,10 +54,18 @@ memory #(
     .imm_o(imm)
   );
 
-  // ------------------------------------------------------------
-  // Control path
-  // ------------------------------------------------------------
-  control control_path (
+  //Control
+  logic pcsel;
+  logic immsel;
+  logic regwren;
+  logic rs1sel;
+  logic rs2sel;
+  logic memren;
+  logic memwren;
+  logic [1:0] wbsel;
+  logic [3:0] alusel;
+
+  control control1 (
     .insn_i(insn_decode),
     .opcode_i(opcode),
     .funct7_i(funct7),
@@ -118,9 +81,18 @@ memory #(
     .alusel_o(alusel)
   );
 
-  // ------------------------------------------------------------
-  // PROBE CONNECTIONS (THIS FIXES F-STAGE MISMATCH)
-  // ------------------------------------------------------------
-
-
+  //Memory
+  memory #(
+    .AWIDTH(AWIDTH),
+    .DWIDTH(DWIDTH)
+  ) mem1 (
+    .clk(clk),
+    .rst(reset),
+    .addr_i(pc_fetch),
+    .data_i('0),
+    .read_en_i(1'b1),
+    .write_en_i(1'b0),
+    .data_o(insn_fetch),
+    .data_vld_o()
+  );
 endmodule : pd2
