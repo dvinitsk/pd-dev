@@ -23,8 +23,7 @@ module fetch #(
 	input logic clk,
 	input logic rst,
 	// outputs	
-	output logic [AWIDTH - 1:0] pc_o, 
-    output logic [DWIDTH - 1:0] insn_o
+	output logic [AWIDTH - 1:0] pc_o
 );
     /*
      * Process definitions to be filled by

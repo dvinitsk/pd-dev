@@ -52,33 +52,51 @@ module decode #(
      */
 
     //Reset signal
-    always_ff @(posedge clk) begin
+    always_comb begin
         if (rst) begin
-            pc_o <= 32'h01000000; //BASEADDR
-            insn_o <= 32'h01000000;
+            pc_o = 32'h01000000; //BASEADDR
+            insn_o = 32'h00000013;
         end else begin
-            pc_o <= pc_i;
-            insn_o <= insn_i;
+            pc_o = pc_i;
+            insn_o = insn_i;
         end
     end
 
     //break instruction into fields
     always_comb begin
-        opcode_o = insn_o[6:0];
-        rd_o = insn_o[11:7];
-        rs1_o = insn_o[19:15];
-        rs2_o = insn_o[24:20];
-        funct7_o = insn_o[31:25];
-        funct3_o = insn_o[14:12];
-        shamt_o = insn_o[24:20];
+        opcode_o = insn_i[6:0];
+        rd_o     = insn_i[11:7];
+        rs1_o    = insn_i[19:15];
+        funct3_o = insn_i[14:12];
+        shamt_o  = insn_i[24:20];
+
+        // Default to zero for RS2 and FUNCT7
+        rs2_o    = 5'd0;
+        funct7_o = 7'd0;
+
+        case (opcode_o)
+            R_TYPE: begin
+                rs2_o    = insn_i[24:20];
+                funct7_o = insn_i[31:25];
+            end
+            STORES, BRANCHES: begin
+                rs2_o    = insn_i[24:20];
+                funct7_o = 7'd0; // unused
+                rd_o = 0;
+            end
+            default: begin
+                // I-type, J-type, LUI, AUIPC, etc.
+                rs2_o    = 5'd0;
+                funct7_o = 7'd0;
+            end
+        endcase
     end
 
     //igen for imm_o
     igen igen1(
         .opcode_i(opcode_o),
-        .insn_i(insn_o),
+        .insn_i(insn_i),
         .imm_o(imm_o)
     );
 
 endmodule : decode
-
