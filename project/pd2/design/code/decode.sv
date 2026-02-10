@@ -55,7 +55,7 @@ module decode #(
     always_comb begin
         if (rst) begin
             pc_o = 32'h01000000; //BASEADDR
-            insn_o = 32'h00000013;
+            insn_o = 32'h01000000;
         end else begin
             pc_o = pc_i;
             insn_o = insn_i;
@@ -65,28 +65,26 @@ module decode #(
     //break instruction into fields
     always_comb begin
         opcode_o = insn_i[6:0];
-        rd_o     = insn_i[11:7];
-        rs1_o    = insn_i[19:15];
+        rd_o = insn_i[11:7];
+        rs1_o = insn_i[19:15];
         funct3_o = insn_i[14:12];
-        shamt_o  = insn_i[24:20];
-
-        // Default to zero for RS2 and FUNCT7
-        rs2_o    = 5'd0;
-        funct7_o = 7'd0;
+        shamt_o = insn_i[24:20];
+        rs2_o = insn_i[24:20];
+        funct7_o = insn_i[31:25];
 
         case (opcode_o)
             R_TYPE: begin
-                rs2_o    = insn_i[24:20];
+                rs2_o = insn_i[24:20];
                 funct7_o = insn_i[31:25];
             end
-            STORES, BRANCHES: begin
-                rs2_o    = insn_i[24:20];
-                funct7_o = 7'd0; // unused
+            STORES, BRANCHES: begin //set not used fields to 0
+                rs2_o = insn_i[24:20];
+                funct7_o = 7'd0;
                 rd_o = 0;
             end
             default: begin
-                // I-type, J-type, LUI, AUIPC, etc.
-                rs2_o    = 5'd0;
+                // I-type, J-type, U-type
+                rs2_o = 5'd0;
                 funct7_o = 7'd0;
             end
         endcase
@@ -98,5 +96,4 @@ module decode #(
         .insn_i(insn_i),
         .imm_o(imm_o)
     );
-
 endmodule : decode
