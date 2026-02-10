@@ -31,10 +31,11 @@ module fetch #(
      */
 
     always_ff @(posedge clk) begin
-        if (rst)
+      if (rst) begin
             pc_o <= BASEADDR; //reset to base address
-        else
+      end else begin
             pc_o <= pc_o + 32'd4; //pc_o increases by 4 bytes because instruction size is 32 bits
+          end
     end
 
 endmodule : fetch
