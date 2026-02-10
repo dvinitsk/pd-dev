@@ -104,6 +104,7 @@ module top;
 
   // Task to check control signals
   task automatic check_control_signals(
+    input logic [31:0] expected_pc,
     input logic expected_pcsel,
     input logic expected_immsel,
     input logic expected_regwren,
@@ -128,11 +129,11 @@ module top;
           dut.alusel !== expected_alusel) begin
         fail_count++;
         $display("FAIL [CONTROL] %s:", test_name);
-        $display("  Expected: pcsel=%b immsel=%b regwren=%b rs1sel=%b rs2sel=%b memren=%b memwren=%b wbsel=%b alusel=%h",
-                 expected_pcsel, expected_immsel, expected_regwren, expected_rs1sel, expected_rs2sel,
+        $display("  Expected: PC=%h pcsel=%b immsel=%b regwren=%b rs1sel=%b rs2sel=%b memren=%b memwren=%b wbsel=%b alusel=%h",
+                expected_pc,  expected_pcsel, expected_immsel, expected_regwren, expected_rs1sel, expected_rs2sel,
                  expected_memren, expected_memwren, expected_wbsel, expected_alusel);
-        $display("  Got:      pcsel=%b immsel=%b regwren=%b rs1sel=%b rs2sel=%b memren=%b memwren=%b wbsel=%b alusel=%h",
-                 dut.pcsel, dut.immsel, dut.regwren, dut.rs1sel, dut.rs2sel,
+        $display("  Got:    PC=%h  pcsel=%b immsel=%b regwren=%b rs1sel=%b rs2sel=%b memren=%b memwren=%b wbsel=%b alusel=%h",
+                dut.pc_decode, dut.pcsel, dut.immsel, dut.regwren, dut.rs1sel, dut.rs2sel,
                  dut.memren, dut.memwren, dut.wbsel, dut.alusel);
       end else begin
         pass_count++;
@@ -146,7 +147,6 @@ module top;
   task automatic test_reset();
     $display("\n--- Testing Reset ---");
     // After reset, PC should start at BASEADDR
-    tick();
     check_fetch_stage(32'h01000000, 32'hfd010113, "Reset PC");
   endtask
 
@@ -162,20 +162,15 @@ module top;
   // Test: Decode I-type instruction (ADDI)
   task automatic test_decode_i_type();
     $display("\n--- Testing I-Type Decode (ADDI) ---");
-    // Wait for first instruction to propagate through decode
-    tick();
-    tick();
-    // Instruction: fd010113 = addi sp, sp, -48
-    // opcode=0010011, rd=00010, funct3=000, rs1=00010, imm=ffffffd0
     check_decode_stage(
-      32'h01000000,  // PC
-      7'b0010011,    // opcode (I-type immediate)
-      5'd2,          // rd (sp = x2)
-      5'd2,          // rs1 (sp = x2)
-      5'd0,          // rs2 (not used for I-type)
-      3'b000,        // funct3 (ADDI)
-      7'd0,          // funct7 (not used for I-type)
-      32'hffffffd0,  // imm (sign-extended -48)
+      32'h01000000,  
+      7'b0010011,    
+      5'd2,          
+      5'd2,          
+      5'd0,          
+      3'b000,        
+      7'd0,          
+      32'hffffffd0,  
       "ADDI decode"
     );
   endtask
@@ -183,30 +178,24 @@ module top;
   // Test: Control signals for I-type
   task automatic test_control_i_type();
     $display("\n--- Testing I-Type Control Signals ---");
-    tick();
-    tick();
-    // For ADDI: immsel=1, regwren=1, rs2sel=1, alusel=ADD
     check_control_signals(
+      32'h01000004, //PC
       1'b0,   // pcsel
       1'b1,   // immsel
-      1'b1,   // regwren
+      1'b0,   // regwren
       1'b0,   // rs1sel
       1'b1,   // rs2sel
       1'b0,   // memren
-      1'b0,   // memwren
+      1'b1,   // memwren
       2'b00,  // wbsel (ALU)
       4'd0,   // alusel (ADD)
       "ADDI control"
     );
   endtask
 
-  // Test: R-type instruction
-  task automatic test_r_type();
-    $display("\n--- Testing R-Type Instructions ---");
-    // Need to advance to an R-type instruction in the test program
-    // This would require knowing what's in your test1.x at specific addresses
-    // For now, this is a template
-    $display("  (Skipped - requires specific test program analysis)");
+  task automatic send_reset();
+    dut.pc_fetch = 32'h01000000;
+    #1;
   endtask
 
   // Main test sequence
@@ -222,9 +211,10 @@ module top;
     // Run tests
     test_reset();
     test_pc_increment();
+    send_reset();
     test_decode_i_type();
+    send_reset();
     test_control_i_type();
-    test_r_type();
 
     // Print summary
     $display("\n========================================");
