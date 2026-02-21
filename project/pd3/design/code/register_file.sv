@@ -38,4 +38,38 @@
      * student below...
      */
 
+    logic [DWIDTH-1:0] registers [31:0];
+
+    //comb reads
+    always_comb begin
+        //index 0 is reserved for 0, if not assign rs1 address value to rs1data
+        if (rs1_i == 5'd0) begin
+            rs1data_o = ZERO;
+        end else begin
+            rs1data_o = registers[rs1_i];
+        end
+
+        if (rs2_i == 5'd0) begin
+            rs2data_o = ZERO;
+        end else begin
+            rs2data_o = registers[rs2_i];
+        end
+    end
+
+    //sequential writes
+    always_ff @(posedge clk) begin
+        if (rst) begin //reset and stack pointer reset (x2)
+            //loop through each register and reset its value to 0
+            for (int i = 0; i < 32; i++) begin
+                registers[i] <= ZERO;
+            end
+            registers[2] <= 32'hFFFFFFFC; //on reset stack pointer x2 from high memory to low memory
+        end else begin
+            //if write enabled and destination is not 0 write to destination on posedge clk
+            if (regwren_i && rd_i != 5'd0) begin
+                registers[rd_i] <= datawb_i;
+            end
+        end
+    end
+
 endmodule : register_file
