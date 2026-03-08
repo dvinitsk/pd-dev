@@ -28,9 +28,19 @@
      output logic [AWIDTH-1:0] next_pc_o
  );
 
-    /*
-     * Process definitions to be filled by
-     * student below...
-     */
+    localparam logic [AWIDTH-1:0] PC_INC = 32'd4;
+
+    // Writeback data: 00=ALU result, 01=memory data, 10=PC+4 (for JAL/JALR)
+    always_comb begin
+        case (wbsel_i)
+            2'b00: writeback_data_o = alu_res_i;
+            2'b01: writeback_data_o = memory_data_i;
+            2'b10: writeback_data_o = pc_i + PC_INC;
+            default: writeback_data_o = alu_res_i;
+        endcase
+    end
+
+    // Next PC: branch target when taken, else sequential PC+4
+    assign next_pc_o = brtaken_i ? alu_res_i : (pc_i + PC_INC);
 
 endmodule : writeback
